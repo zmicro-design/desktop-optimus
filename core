@@ -54,11 +54,8 @@ install() {
     case $DESKTOP_CORE_VERSION in
     v0.5.0-beta)
       case $arch in
-      arm64)
-        cache_file_checksum_expect="9fa18ccd04bf1b7bed0311613c11c6b52f67f24193a211af92482f65ff745446"
-        ;;
-      amd64)
-        cache_file_checksum_expect="cbe42cf8ecc33b8e0c23849e2743256a8dcd1895c936b3d73d5ba96c5671bc6d"
+      arm64 | amd64)
+        cache_file_checksum_expect="2078f0a72202341fd577a095a6c371e2d6c456b706eb8effc39505b18e3c0f8b"
         ;;
       esac
       ;;
@@ -100,7 +97,7 @@ install() {
   log::info "[$(timestamp)][desktop][$name] installing $cache_file ..."
   case $arch in
   arm64)
-    tar -zxvf $cache_file
+    tar -zxvf $cache_file >>/dev/null
     install::dmg optimus.dmg ${name} "${app_name}" "/Volumes/Optimus installer"
     ;;
   *)
