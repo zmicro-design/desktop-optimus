@@ -50,20 +50,17 @@ install() {
   if [ -f "$cache_file" ]; then
     local cache_file_checksum=$(os::sha256 $cache_file)
     local cache_file_checksum_expect=""
+    local cache_file_checksum_line="${DESKTOP_CORE_VERSION}#${platform}#${arch}#${cache_file_checksum}"
 
-    case $DESKTOP_CORE_VERSION in
-    v0.5.0-beta)
-      case $arch in
-      arm64 | amd64)
-        cache_file_checksum_expect="2078f0a72202341fd577a095a6c371e2d6c456b706eb8effc39505b18e3c0f8b"
-        ;;
-      esac
-      ;;
-    esac
+    # @TODO must reload config here for env DESKTOP_CORE_CHECKSUMS, or it will be empty
+    source $DESKTOP_DIR/config
 
-    if [ "$cache_file_checksum" = "$cache_file_checksum_expect" ]; then
-      is_cached="true"
-    fi
+    for checksum in ${DESKTOP_CORE_CHECKSUMS[@]}; do
+      if [ "$checksum" = "$cache_file_checksum_line" ]; then
+        is_cached="true"
+        break
+      fi
+    done
   fi
 
   if [ "$is_cached" = "true" ]; then
@@ -96,7 +93,7 @@ install() {
   # install
   log::info "[$(timestamp)][desktop][$name] installing $cache_file ..."
   case $arch in
-  arm64)
+  arm64 | amd64)
     tar -zxvf $cache_file >>/dev/null
     install::dmg optimus.dmg ${name} "${app_name}" "/Volumes/Optimus installer"
     ;;
